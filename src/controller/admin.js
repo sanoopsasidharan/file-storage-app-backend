@@ -8,12 +8,13 @@ const Admin = require("../model/adminModel");
 
 module.exports = {
   // lising all users
-  usersList: async (req, res, next) => {
+  usersListing: async (req, res, next) => {
     try {
       const users = await User.find();
       console.log(users);
-      if (users.length > 0) res.json({ users, meg: "user list" });
-      else res.json({ msg: "no users" });
+      if (users.length > 0)
+        res.status(200).json({ users, status: true, meg: "user list" });
+      else res.status(404).json({ msg: "no users", status: false });
     } catch (error) {
       console.log(error);
       next(error);
@@ -84,12 +85,10 @@ module.exports = {
   },
 
   // listing fils
-  getfiles: async (req, res, next) => {
+  listingfiles: async (req, res, next) => {
     try {
-      const { id, userNme } = req.payload;
-      var userId = mongoose.Types.ObjectId(id);
+      var userId = mongoose.Types.ObjectId(req.query.userId);
       const files = await Files.find({ userId });
-      console.log(files.length > 0);
       if (files.length > 0) res.status(200).json({ status: true, files });
       else res.status(200).json({ status: false, mesg: "no files " });
     } catch (error) {

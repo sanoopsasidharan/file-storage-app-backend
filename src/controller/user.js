@@ -20,7 +20,7 @@ module.exports = {
 
       const user = new User({ email, name, number, password });
       const saveUser = await user.save();
-      res.json({ saveUser, user: true, msg: "" });
+      res.status(200).json({ saveUser, user: true, msg: "" });
     } catch (error) {
       console.log(error);
       next(error);
@@ -62,7 +62,6 @@ module.exports = {
       const user = await User.findOne({ email });
       console.log(user);
 
-      console.log(user);
       if (!user) throw createError.NotFound("user not registered");
 
       // cheking password
@@ -75,7 +74,7 @@ module.exports = {
 
       const accessToken = await AccessToken(user);
 
-      res.json({ user, loggedIn: true, token: accessToken });
+      res.status(200).json({ user, loggedIn: true, token: accessToken });
     } catch (error) {
       console.log(error);
       next(error);

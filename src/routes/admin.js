@@ -1,5 +1,9 @@
 var express = require("express");
-const { adminLogin } = require("../controller/admin");
+const {
+  adminLogin,
+  usersListing,
+  listingfiles,
+} = require("../controller/admin");
 const { verifyAdminToken } = require("../middleware/jwt");
 var router = express.Router();
 
@@ -10,6 +14,12 @@ router.get("/", function (req, res, next) {
 
 // login admin
 router.post("/login", adminLogin);
+
+// listing all users
+router.get("/user-list", verifyAdminToken, usersListing);
+
+// listing users files
+router.get("/files", verifyAdminToken, listingfiles);
 
 router.post("/IsAdminLogin", verifyAdminToken, (req, res, next) => {
   let payload = req.payload;
