@@ -27,38 +27,6 @@ module.exports = {
     });
   },
 
-  RefreshToken: (userId) => {
-    return new Promise((resolve, rejcet) => {
-      const payload = {};
-      const secret = process.env.REFRESH_TOKEN_SECRET;
-      const options = {
-        expiresIn: "1y",
-        issuer: "vehHope.sanoopsasidharan.tech",
-        audience: userId,
-      };
-      jwt.sign(payload, secret, options, (err, token) => {
-        if (err) {
-          console.log(err.message);
-          rejcet(createError.InternalServerError());
-        } else {
-          resolve(token);
-        }
-      });
-    });
-  },
-  verifyRefreshToken: (refreshToken) => {
-    return new Promise((resolve, reject) => {
-      jwt.verify(
-        refreshToken,
-        process.env.REFRESH_TOKEN_SECRET,
-        (err, payload) => {
-          if (err) return reject(createError.Unauthorized());
-          const userId = payload.aud;
-          resolve(userId);
-        }
-      );
-    });
-  },
   verifyAccessToken: (req, res, next) => {
     console.log("calling is loggedin ");
     // console.log(req.cookies.userTocken, "req.cookies.userTocken ....");

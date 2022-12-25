@@ -3,14 +3,10 @@ const {
   adminLogin,
   usersListing,
   listingfiles,
+  LogoutAdmin,
 } = require("../controller/admin");
 const { verifyAdminToken } = require("../middleware/jwt");
 var router = express.Router();
-
-/* GET users listing. */
-router.get("/", function (req, res, next) {
-  res.send("respond with a resource");
-});
 
 // login admin
 router.post("/login", adminLogin);
@@ -20,6 +16,9 @@ router.get("/user-list", verifyAdminToken, usersListing);
 
 // listing users files
 router.get("/files", verifyAdminToken, listingfiles);
+
+// adminlogout
+router.post("/logout", LogoutAdmin);
 
 router.post("/IsAdminLogin", verifyAdminToken, (req, res, next) => {
   let payload = req.payload;
