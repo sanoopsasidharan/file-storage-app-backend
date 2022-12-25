@@ -61,11 +61,11 @@ module.exports = {
   },
   verifyAccessToken: (req, res, next) => {
     console.log("calling is loggedin ");
-    console.log(req.cookies.userTocken, "req.cookies.userTocken ....");
-    console.log(req.cookies, "req.cookies. MMMMMMMM ....");
+    // console.log(req.cookies.userTocken, "req.cookies.userTocken ....");
+    // console.log(req.cookies, "req.cookies. MMMMMMMM ....");
     if (!req.cookies.userTocken) return res.json({ user: false });
     const userToken = req.cookies.userTocken;
-    console.log(userToken, "userToken");
+    // console.log(userToken, "userToken");
     jwt.verify(userToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
       if (err) {
         return res.json({ user: false });

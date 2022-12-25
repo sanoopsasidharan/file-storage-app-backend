@@ -2,6 +2,7 @@ const User = require("../model/userModel");
 // var objectId = require("mongoose").ObjectId;
 var mongoose = require("mongoose");
 const { hashing, passwordCheck } = require("../config/passwordHashing");
+const { AccessToken } = require("../middleware/jwt");
 // const query  = {"_id":ObjectId(req.params.productId)}
 
 module.exports = {
@@ -59,14 +60,27 @@ module.exports = {
       let { email, password } = req.body;
       const user = await User.findOne({ email });
       console.log(user);
+
+      console.log(user);
+      if (!user) throw createError.NotFound("user not registered");
+
       // cheking password
       const isMatch = await passwordCheck(password, user.password);
 
+      if (!isMatch)
+        throw createError.Unauthorized("username/password not valid");
+
       console.log(isMatch);
 
-      if (isMatch) {
-        res.json({ user: true, msg: "user login" });
-      }
+      const accessToken = await AccessToken(user);
+
+      res
+        // .cookie("userTocken", accessToken, { httpOnly: true })
+        .json({ user, loggedIn: true, token: accessToken });
+
+      // if (isMatch) {
+      //   res.json({ user: true, msg: "user login" });
+      // }
     } catch (error) {
       console.log(error);
       next(error);
