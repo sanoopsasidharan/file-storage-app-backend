@@ -75,21 +75,20 @@ module.exports = {
       }
     });
   },
-  // admin access Token
 
-  // shop access token
-  shopAccessToken: (shop) => {
-    const id = shop._id + "";
-    const shopNme = shop.shopName;
+  // admin access token
+  adminAccessToken: (admin) => {
+    const id = admin._id + "";
+    const adminNme = admin.name;
     return new Promise((resolve, rejcet) => {
       const payload = {
-        shopNme,
+        adminNme,
         id,
       };
       const secret = process.env.ACCESS_TOKEN_SECRET;
       const options = {
         expiresIn: "1y",
-        issuer: "vehHope.sanoopsasidharan.tech",
+        issuer: "sanoopsasidharan.tech",
         audience: id,
       };
       jwt.sign(payload, secret, options, (err, token) => {
@@ -101,12 +100,14 @@ module.exports = {
       });
     });
   },
-  verifyShopToken: async (req, res, next) => {
-    if (!req.cookies.shopTocken) return res.json({ shop: false });
-    const { shopTocken } = req.cookies;
-    jwt.verify(shopTocken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+  verifyAdminToken: async (req, res, next) => {
+    // console.log(req.cookies.adminTocken, "req.cookies.adminTocken");
+
+    if (!req.cookies.adminTocken) return res.json({ admin: false });
+    const { adminTocken } = req.cookies;
+    jwt.verify(adminTocken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
       if (err) {
-        return res.json({ shop: false });
+        return res.json({ admin: false });
       } else {
         req.payload = payload;
         next();

@@ -1,31 +1,12 @@
 const User = require("../model/userModel");
 var ObjectId = require("mongoose").ObjectId;
 var mongoose = require("mongoose");
-const { hashing, passwordCheck } = require("../config/passwordHashing");
-const { AccessToken } = require("../middleware/jwt");
+const { AccessToken, adminAccessToken } = require("../middleware/jwt");
 const Files = require("../model/fileModel");
-// const query  = {"_id":ObjectId(req.params.productId)}
+const createError = require("http-errors");
+const Admin = require("../model/adminModel");
 
 module.exports = {
-  // creating the user
-  registerUser: async (req, res, next) => {
-    try {
-      console.log("createing user");
-      let { email, name, number, password } = req.body;
-      const doesExist = await User.findOne({ email });
-      if (doesExist)
-        return res.json({ user: false, msg: `${email} is already registered` });
-      // hashing password
-      password = await hashing(password);
-
-      const user = new User({ email, name, number, password });
-      const saveUser = await user.save();
-      res.json({ saveUser, user: true, msg: "" });
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
-  },
   // lising all users
   usersList: async (req, res, next) => {
     try {
@@ -69,7 +50,7 @@ module.exports = {
       const isMatch = await passwordCheck(password, user.password);
 
       if (!isMatch)
-        throw createError.Unauthorized("username/password not valid");
+        throw createError.Unauthorized("useremail/password not valid");
 
       console.log(isMatch);
 
@@ -81,24 +62,27 @@ module.exports = {
       next(error);
     }
   },
-  // add pdf into db
-  addingPdf: async (req, res, next) => {
+  //   admin login
+  adminLogin: async (req, res, next) => {
     try {
-      console.log(req.payload);
-      const { id, userNme } = req.payload;
-      const { url, fileName } = req.body;
-      console.log(req.body);
-      var userId = mongoose.Types.ObjectId(id);
-      console.log(userId);
+      let { email, password } = req.body;
+      const admin = await Admin.findOne({ email });
+      // console.log(admin);
+      if (!admin) throw createError.NotFound("email/password not valid");
 
-      const file = new Files({ name: userNme, url, userId, fileName });
-      const saveFile = await file.save();
-      res.status(200).json({ status: true, data: saveFile });
+      if (password === admin.password) {
+        const accessToken = await adminAccessToken(admin);
+        res
+          .cookie("adminTocken", accessToken, { httpOnly: true })
+          .json({ admin, loggedIn: true, token: accessToken });
+      }
+      createError.NotFound("email/password not valid");
     } catch (error) {
       console.log(error);
       next(error);
     }
   },
+
   // listing fils
   getfiles: async (req, res, next) => {
     try {
